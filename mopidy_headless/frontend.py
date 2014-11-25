@@ -52,15 +52,8 @@ class MuteHandler(Handler):
 class InputFrontend(pykka.ThreadingActor, core.CoreListener):
     def __init__(self, config, core):
         super(InputFrontend, self).__init__()
-
         self.config = config['headless']
-
         self.core=core
-        self._volume_cache = 0
-        self.muted=False
-
-        logger.info('Volume: {0}'.format(self.core.playback.volume.get()))
-
 
     def on_start(self):
         self.inputthread=InputThread()
@@ -71,7 +64,6 @@ class InputFrontend(pykka.ThreadingActor, core.CoreListener):
 
     def on_stop(self):
         self.inputthread.stop()
-        self.inputthread.join()
 
     def halt(self):
         print("Goodbye")
@@ -83,12 +75,13 @@ class InputFrontend(pykka.ThreadingActor, core.CoreListener):
       elif volume>100:
           volume=100
           
-      logger.info("Volume changed: {0}".format(volume))
+      logger.debug("Volume changed: {0}".format(volume))
       self.core.playback.volume=volume
 
     def toggle_mute(self):
-        self.muted= not self.muted
-        print("Muted: {0}".format(self.muted))
+        mute = not self.core.playback.mute.get()
+        logger.debug("Muted: {0}".format(mute))
+        self.core.playback.mute = mute
 
     def change_playlist(self, value):
         print("Change playlist")
