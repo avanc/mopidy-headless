@@ -50,7 +50,7 @@ class InputThread(threading.Thread):
 
   def run(self):
     while not self._stop.isSet():
-      r,w,x = select(self.devices_by_fd, [], [], timeout=10)
+      r,w,x = select(self.devices_by_fd, [], [], 10)
       for fd in r:
         for event in self.devices_by_fd[fd].read():
           for handler in self.handlers_by_fd[fd]:
