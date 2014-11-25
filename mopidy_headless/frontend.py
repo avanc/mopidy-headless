@@ -54,8 +54,16 @@ class InputFrontend(pykka.ThreadingActor, core.CoreListener):
         super(InputFrontend, self).__init__()
         self.config = config['headless']
         self.core=core
+        
+        self.playlists = None
+        self.selected_playlist = None
+        
 
     def on_start(self):
+        self.reload_playlists()
+        self.change_playlist(0)
+        
+        
         self.inputthread=InputThread()
         self.inputthread.registerHandler(VolumeHandler(self.config["volume_device"], "EV_REL", self.config["volume_axis"], self.actor_ref))
         self.inputthread.registerHandler(PlaylistHandler(self.config["playlist_device"], "EV_REL", self.config["playlist_axis"], self.actor_ref))
@@ -84,4 +92,14 @@ class InputFrontend(pykka.ThreadingActor, core.CoreListener):
         self.core.playback.mute = mute
 
     def change_playlist(self, value):
-        print("Change playlist")
+        self.selected_playlist= (self.selected_playlist+1) % len(self.playlists)
+        logger.debug("Change playlist: {0}".format(self.selected_playlist))
+        self.core.tracklist.clear()
+        self.core.tracklist.add(uri=self.playlists[self.selected_playlist].uri)
+        self.core.playback.play()
+        
+    def reload_playlists(self):
+        self.playlists = []
+        for playlist in self.core.playlists.playlists.get():
+            self.playlists.append(playlist)
+        self.selected_playlist = 0
