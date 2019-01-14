@@ -17,8 +17,8 @@ class VolumeHandler(Handler):
     self.actor_proxy=actor_ref.proxy()
 
   def handle(self, event):
-    logger.debug("Volume change {0}".format(event.value))
-    self.actor_proxy.change_volume(event.value)
+    logger.debug("Volume change {0}".format(event.value*5))
+    self.actor_proxy.change_volume(event.value*5)
 
 
 class PlaylistHandler(Handler):
