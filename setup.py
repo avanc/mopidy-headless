@@ -19,7 +19,7 @@ setup(
     author='Sven Klomp',
     author_email='mail@klomp.eu',
     description='Mopidy extension for controlling via input devices',
-    long_description=open('README.rst').read(),
+    long_description=open('README.md').read(),
     packages=find_packages(exclude=['tests', 'tests.*']),
     zip_safe=False,
     include_package_data=True,
