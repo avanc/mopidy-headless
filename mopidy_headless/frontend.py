@@ -95,7 +95,10 @@ class InputFrontend(pykka.ThreadingActor, core.CoreListener):
         self.selected_playlist= (self.selected_playlist+1) % len(self.playlists)
         logger.debug("Change playlist: {0}".format(self.selected_playlist))
         self.core.tracklist.clear()
-        self.core.tracklist.add(uri=self.playlists[self.selected_playlist].uri)
+        logger.debug("Playing {0}".format(self.playlists[self.selected_playlist].uri))
+        track_uris = [track.uri for track in self.playlists[self.selected_playlist].tracks]
+        logger.debug("Tracks: {0}".format(track_uris))
+        self.core.tracklist.add(uris=track_uris)
         self.core.playback.play()
         
     def reload_playlists(self):
@@ -103,3 +106,4 @@ class InputFrontend(pykka.ThreadingActor, core.CoreListener):
         for playlist in self.core.playlists.playlists.get():
             self.playlists.append(playlist)
         self.selected_playlist = 0
+        logger.debug("Found {0} playlists.".format(len(self.playlists)))
