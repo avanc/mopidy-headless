@@ -13,6 +13,7 @@ It is available in [Arch Linux User Repository](https://aur.archlinux.org/packag
 Configuration
 -------------
 Add the configuration to mopidy.conf. The default configuration uses the first input device and assumes it is a mouse:
+
     [headless]
     enabled = true
     
