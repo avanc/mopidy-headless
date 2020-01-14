@@ -46,6 +46,7 @@ class MuteHandler(Handler):
         logger.debug("Longpress mute")
         self.actor_proxy.halt()
       else:
+        logger.debug("Toggle mute")
         self.actor_proxy.toggle_mute()
 
 
@@ -57,12 +58,12 @@ class InputFrontend(pykka.ThreadingActor, core.CoreListener):
         
         self.playlists = None
         self.selected_playlist = None
-        
-
+        if self.config["volume_max"] is None:
+            self.config["volume_max"]=100
+            
     def on_start(self):
         self.reload_playlists()
         self.change_playlist(0)
-        
         
         self.inputthread=InputThread()
         self.inputthread.registerHandler(VolumeHandler(self.config["volume_device"], "EV_REL", self.config["volume_axis"], self.actor_ref))
@@ -77,19 +78,23 @@ class InputFrontend(pykka.ThreadingActor, core.CoreListener):
         print("Goodbye")
 
     def change_volume(self, value):
-      volume=self.core.playback.volume.get()+value
+      volume=self.core.mixer.get_volume().get()+value
       if volume<0:
           volume=0
-      elif volume>100:
-          volume=100
+      elif volume>self.config["volume_max"]:
+          volume=self.config["volume_max"]
           
       logger.debug("Volume changed: {0}".format(volume))
-      self.core.playback.volume=volume
+      self.core.mixer.set_volume(volume)
 
     def toggle_mute(self):
-        mute = not self.core.playback.mute.get()
+        mute = not self.core.mixer.get_mute().get()
         logger.debug("Muted: {0}".format(mute))
-        self.core.playback.mute = mute
+        self.core.mixer.set_mute(mute)
+        if (mute):
+            self.core.playback.pause()
+        else:
+            self.core.playback.resume()
 
     def change_playlist(self, value):
         self.selected_playlist= (self.selected_playlist+1) % len(self.playlists)

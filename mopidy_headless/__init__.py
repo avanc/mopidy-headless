@@ -21,6 +21,8 @@ class Extension(ext.Extension):
         schema = super(Extension, self).get_config_schema()
         schema['volume_device'] = config.String()
         schema['volume_axis'] = config.String()
+        schema['volume_max'] = config.Integer(optional=True)
+        
         schema['playlist_device'] = config.String()
         schema['playlist_axis'] = config.String()
         schema['mute_device'] = config.String()
