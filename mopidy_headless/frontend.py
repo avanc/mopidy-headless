@@ -17,8 +17,8 @@ class VolumeHandler(Handler):
     self.actor_proxy=actor_ref.proxy()
 
   def handle(self, event):
-    logger.debug("Volume change {0}".format(event.value*5))
-    self.actor_proxy.change_volume(event.value*5)
+    logger.debug("Event for volume {0}".format(event.value))
+    self.actor_proxy.change_volume(event.value)
 
 
 class PlaylistHandler(Handler):
@@ -27,7 +27,7 @@ class PlaylistHandler(Handler):
     self.actor_proxy=actor_ref.proxy()
 
   def handle(self, event):
-    logger.debug("Playlist change {0}".format(event.value))
+    logger.debug("Event for playlist {0}".format(event.value))
     self.actor_proxy.change_playlist(event.value)
 
 
@@ -78,7 +78,7 @@ class InputFrontend(pykka.ThreadingActor, core.CoreListener):
         print("Goodbye")
 
     def change_volume(self, value):
-      volume=self.core.mixer.get_volume().get()+value
+      volume=self.core.mixer.get_volume().get()+value*self.config["volume_step"]
       if volume<0:
           volume=0
       elif volume>self.config["volume_max"]:
