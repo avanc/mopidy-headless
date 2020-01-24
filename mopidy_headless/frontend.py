@@ -92,12 +92,12 @@ class InputFrontend(pykka.ThreadingActor, core.CoreListener):
         logger.debug("Muted: {0}".format(mute))
         self.core.mixer.set_mute(mute)
         if (mute):
-            self.core.playback.pause()
+            self.core.playback.stop()
         else:
-            self.core.playback.resume()
+            self.change_playlist(0)
 
     def change_playlist(self, value):
-        self.selected_playlist= (self.selected_playlist+1) % len(self.playlists)
+        self.selected_playlist= (self.selected_playlist+value) % len(self.playlists)
         logger.debug("Change playlist: {0}".format(self.selected_playlist))
         self.core.tracklist.clear()
         logger.debug("Playing {0}".format(self.playlists[self.selected_playlist].uri))
